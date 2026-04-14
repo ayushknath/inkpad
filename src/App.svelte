@@ -2,18 +2,26 @@
   import { v4 as uuidv4 } from "uuid";
   import { Button } from "$lib/components/ui/button/index.js";
   import { Input } from "$lib/components/ui/input/index.js";
+  import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
   import {
     Bold,
+    Cloud,
+    CloudAlert,
+    CloudCheck,
+    CloudUpload,
     Code,
+    Ellipsis,
     Heading1,
     Heading2,
     Italic,
-    Link,
     List,
     ListOrdered,
     PanelRight,
+    Pencil,
+    Plus,
     Search,
     Strikethrough,
+    Trash,
     Underline,
   } from "@lucide/svelte";
   import { onMount } from "svelte";
@@ -24,47 +32,60 @@
   interface Note {
     id: string;
     title: string;
-    body: string;
+    body: any; // TODO: deal later with the type
+    lastChange: {
+      title: string;
+      body: any; // TODO: deal with type later
+    };
     time: {
       createdAt: Date;
       modifiedAt: Date | null;
     };
   }
 
-  const notes: Note[] = $state([
-    {
-      id: uuidv4(),
-      title: "A very long title which should overflow it's container hopefully",
-      body: "Lorem ipsum dolor sit amet consectetur adipisicing elit. A eligendi iste qui, sequi atque aspernatur necessitatibus, tenetur itaque earum maxime officia quaerat accusantium, enim repudiandae iusto voluptate? Facilis, distinctio quam.",
-      time: { createdAt: new Date(), modifiedAt: null },
-    },
-    {
-      id: uuidv4(),
-      title: "A very long title which should overflow it's container hopefully",
-      body: "Lorem ipsum dolor sit amet consectetur adipisicing elit. A eligendi iste qui, sequi atque aspernatur necessitatibus, tenetur itaque earum maxime officia quaerat accusantium, enim repudiandae iusto voluptate? Facilis, distinctio quam.",
-      time: { createdAt: new Date(), modifiedAt: new Date("10 April 2026") },
-    },
-    {
-      id: uuidv4(),
-      title: "A very long title which should overflow it's container hopefully",
-      body: "Hello World",
-      time: { createdAt: new Date("13 April 2026"), modifiedAt: null },
-    },
-    {
-      id: uuidv4(),
-      title: "Title no longer overflows",
-      body: "My note is the best in the world",
-      time: { createdAt: new Date("13 April 2025"), modifiedAt: null },
-    },
-  ]);
-  let displayNotes: Note[] = $state([...notes]);
+  type saveStatusType = "saving" | "saved" | "error" | null;
+
+  let storedNotes = localStorage.getItem("inkpadNotes");
+
+  let notes: Note[] = $state(storedNotes ? JSON.parse(storedNotes) : []);
+  let query = $state("");
+  let displayNotes: Note[] = $derived.by(() => {
+    const q = query.trim().toLowerCase();
+
+    if (!q) return notes;
+
+    return notes.filter((note) => {
+      let bodyHasQ = false;
+
+      for (let i = 0; i < note.body.content.length; i++) {
+        const p = note.body.content[i];
+
+        if (!p.content) continue;
+
+        for (let j = 0; j < p.content.length; j++) {
+          const n = p.content[j];
+          bodyHasQ = n.text.toLowerCase().includes(q);
+          if (bodyHasQ) break;
+        }
+
+        if (bodyHasQ) break;
+      }
+
+      return note.title.toLowerCase().includes(q) || bodyHasQ;
+    });
+  });
 
   let isSidebarClosed: boolean = $state(false);
 
-  let query = $state("");
+  let saveStatus: saveStatusType = $state(null);
 
+  let editorTitle = $state("");
   let bodyField: HTMLElement | undefined = $state();
   let editorState: { editor: Editor | null } = $state({ editor: null });
+
+  let activeNote: string | null = $state(null);
+
+  let saveTimerId: number | null = null;
 
   onMount(() => {
     editorState.editor = new Editor({
@@ -75,28 +96,101 @@
           placeholder: "Body goes here...",
         }),
       ],
-      // content: `Hello World`,
       onTransaction: ({ editor }) => {
         editorState = { editor };
+      },
+      onUpdate({ editor }) {
+        if (saveTimerId) clearTimeout(saveTimerId);
+        saveTimerId = setTimeout(() => {
+          saveNote();
+        }, 500);
       },
     });
   });
 
-  function filterNotes(): void {
-    if (!query) {
-      displayNotes = [...notes];
-      return;
+  function saveNote(): void {
+    saveStatus = "saving";
+
+    if (activeNote) {
+      const idx = notes.findIndex((note) => activeNote === note.id);
+
+      if (idx === -1) return;
+
+      const note = notes[idx];
+
+      const title = note.title;
+      const body = note.body;
+
+      const hasTitleChanged = editorTitle !== title;
+      const hasBodyChanged =
+        JSON.stringify(editorState.editor?.getJSON()) !== JSON.stringify(body);
+
+      if (hasTitleChanged) {
+        note.lastChange.title = title;
+        note.title = editorTitle;
+      }
+
+      if (hasBodyChanged) {
+        note.lastChange.body = body;
+        note.body = editorState.editor?.getJSON();
+      }
+
+      if (hasTitleChanged || hasBodyChanged) {
+        note.time.modifiedAt = new Date();
+        notes.splice(idx, 1, note);
+      }
+    } else {
+      const id = uuidv4();
+      activeNote = id;
+      const note: Note = {
+        id,
+        title: editorTitle,
+        body: editorState.editor?.getJSON(),
+        lastChange: {
+          title: "",
+          body: "",
+        },
+        time: {
+          createdAt: new Date(),
+          modifiedAt: null,
+        },
+      };
+      notes = [note, ...notes];
     }
 
-    let queryString = query.trim().toLowerCase();
-    displayNotes = notes.filter(
-      (note) =>
-        note.title.toLowerCase().includes(queryString) ||
-        note.body.toLowerCase().includes(queryString),
-    );
+    localStorage.setItem("inkpadNotes", JSON.stringify(notes));
+
+    saveStatus = "saved";
   }
 
-  function getTimeString(date: Date): string {
+  function editNote(id: string): void {
+    if (activeNote) saveNote();
+    clearEditor();
+
+    activeNote = id;
+
+    const [note] = notes.filter((note) => id === note.id);
+    editorTitle = note.title;
+    editorState.editor?.commands.setContent(note.body);
+  }
+
+  function deleteNote(id: string): void {
+    if (activeNote && activeNote === id) {
+      clearEditor();
+      activeNote = null;
+    }
+    notes = notes.filter((note) => id !== note.id);
+    localStorage.setItem("inkpadNotes", JSON.stringify(notes));
+  }
+
+  function clearEditor(): void {
+    editorTitle = "";
+    editorState.editor?.commands.clearContent(false);
+  }
+
+  function getTimeString(date: Date | string): string {
+    date = new Date(date);
+
     const rtf = new Intl.RelativeTimeFormat(undefined, {
       numeric: "auto",
       style: "short",
@@ -146,15 +240,34 @@
       <div class="logo {isSidebarClosed ? 'hidden' : ''}">
         <span class="font-bold">INKPAD</span>
       </div>
-      <Button
-        size="icon-sm"
-        variant="outline"
-        class="toggle"
-        onclick={() => (isSidebarClosed = !isSidebarClosed)}
-        title="Toggle sidebar"
+      <div
+        class="flex {isSidebarClosed
+          ? 'flex-col-reverse justify-center'
+          : 'items-center'} gap-2"
       >
-        <PanelRight />
-      </Button>
+        <Button
+          class="new-note-btn"
+          size="icon-sm"
+          variant="outline"
+          title="New note"
+          onclick={() => {
+            if (activeNote) saveNote();
+            activeNote = null;
+            clearEditor();
+          }}
+        >
+          <Plus />
+        </Button>
+        <Button
+          size="icon-sm"
+          variant="outline"
+          class="toggle"
+          title="Toggle sidebar"
+          onclick={() => (isSidebarClosed = !isSidebarClosed)}
+        >
+          <PanelRight />
+        </Button>
+      </div>
     </header>
 
     <div class="mb-4 {isSidebarClosed ? 'hidden' : ''}">
@@ -167,7 +280,6 @@
           class="pl-8.5"
           type="search"
           bind:value={query}
-          oninput={filterNotes}
           placeholder="Search your notes"
         />
       </div>
@@ -177,7 +289,7 @@
       <ul class="flex flex-col gap-4 h-125 overflow-auto">
         {#each displayNotes as note (note.id)}
           <li class="border rounded-md p-2">
-            <header class="mb-2">
+            <header class="flex items-center justify-between mb-2">
               <span>
                 <small class="text-gray-500">
                   {note.time.modifiedAt
@@ -185,6 +297,23 @@
                     : `Created: ${getTimeString(note.time.createdAt)}`}
                 </small>
               </span>
+              <DropdownMenu.Root>
+                <DropdownMenu.Trigger>
+                  <Button size="icon-sm" variant="outline" title="More options">
+                    <Ellipsis />
+                  </Button>
+                </DropdownMenu.Trigger>
+                <DropdownMenu.Content class="w-auto">
+                  <DropdownMenu.Group>
+                    <DropdownMenu.Item onSelect={() => editNote(note.id)}>
+                      <Pencil /> Edit
+                    </DropdownMenu.Item>
+                    <DropdownMenu.Item onSelect={() => deleteNote(note.id)}>
+                      <Trash /> Delete
+                    </DropdownMenu.Item>
+                  </DropdownMenu.Group>
+                </DropdownMenu.Content>
+              </DropdownMenu.Root>
             </header>
 
             <h2
@@ -192,7 +321,11 @@
             >
               {note.title}
             </h2>
-            <p class="note-body text-sm">{note.body}</p>
+            <p class="note-body text-sm">
+              {#each note.body.content[0].content as c}
+                <span>{c.text}</span>
+              {/each}
+            </p>
           </li>
         {/each}
       </ul>
@@ -208,7 +341,7 @@
   </section>
 
   <section class="editor py-4 px-8">
-    <header class="flex items-center gap-4 mb-12">
+    <header class="flex items-center justify-between mb-12">
       <div class="toolbar">
         <ul class="flex items-center gap-2">
           <li>
@@ -392,7 +525,21 @@
           </li>
         </ul>
       </div>
-      <!-- <div class="note-save-status"></div> -->
+      <div class="note-save-status">
+        {#if activeNote}
+          <div title={saveStatus ? saveStatus : ""}>
+            {#if saveStatus === "saving"}
+              <CloudUpload size={20} />
+            {:else if saveStatus === "saved"}
+              <CloudCheck size={20} />
+            {:else if saveStatus === "error"}
+              <CloudAlert size={20} />
+            {:else}
+              <Cloud size={20} />
+            {/if}
+          </div>
+        {/if}
+      </div>
     </header>
 
     <div class="editor-fields">
@@ -401,6 +548,13 @@
           class="text-xl w-full"
           id="editor-title-input"
           type="text"
+          bind:value={editorTitle}
+          oninput={() => {
+            if (saveTimerId) clearTimeout(saveTimerId);
+            saveTimerId = setTimeout(() => {
+              saveNote();
+            }, 500);
+          }}
           placeholder="Title goes here..."
         />
       </div>
