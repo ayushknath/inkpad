@@ -15,6 +15,7 @@
   import { setEditorMethodsContext } from "$lib/contexts/editorMethodsContext";
   import { setSaveStatusContext } from "$lib/contexts/saveStatusContext";
   import { setDebounceSaveContext } from "$lib/contexts/debounceSaveContext";
+  import { startTime, stopTime } from "$lib/state/time.svelte";
 
   // Note states and context setting
   const noteStates: noteStatesType = $state({
@@ -179,6 +180,8 @@
   setEditorMethodsContext({ saveNote, editNote, deleteNote, clearEditor });
 
   onMount(() => {
+    startTime();
+
     editorStates.editorState.editor = new Editor({
       element: editorStates.bodyField,
       extensions: [
@@ -195,6 +198,11 @@
         startDebounceSaveTimer();
       },
     });
+
+    return () => {
+      stopTime();
+      editorStates.editorState.editor?.destroy();
+    };
   });
 </script>
 

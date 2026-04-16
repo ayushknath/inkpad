@@ -4,21 +4,11 @@
   import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
   import { Ellipsis, Pencil, Trash } from "@lucide/svelte";
   import { getEditorMethodsContext } from "$lib/contexts/editorMethodsContext";
-  import { onMount } from "svelte";
+  import { time } from "$lib/state/time.svelte";
 
   const { editNote, deleteNote } = getEditorMethodsContext();
 
   let { note }: { note: Note } = $props();
-
-  let now = $state(Date.now());
-
-  onMount(() => {
-    const interval = setInterval(() => {
-      now = Date.now();
-    }, 60000);
-
-    return () => clearInterval(interval);
-  });
 
   function getTimeString(date: Date | string, now: number): string {
     date = new Date(date);
@@ -37,16 +27,19 @@
       { amount: 12, name: "months" },
       { amount: Number.POSITIVE_INFINITY, name: "years" },
     ];
-    const LEN_DIVISIONS = DIVISIONS.length;
 
-    let duration = (date.getTime() - now) / 1000;
+    const seconds = (now - date.getTime()) / 1000;
+    if (seconds < 0) return "now";
+
+    const isPast = seconds >= 0;
+    let duration = Math.abs(seconds);
     let timeString = "";
 
-    for (let i = 0; i < LEN_DIVISIONS; i++) {
-      const d = DIVISIONS[i];
-      if (Math.abs(duration) < d.amount) {
+    for (const d of DIVISIONS) {
+      if (duration < d.amount) {
+        const value = isPast ? -duration : duration;
         timeString = rtf.format(
-          Math.round(duration),
+          Math.round(value),
           d.name as Intl.RelativeTimeFormatUnit,
         );
         break;
@@ -63,8 +56,8 @@
     <span>
       <small class="text-gray-500">
         {note.time.modifiedAt
-          ? `Modified: ${getTimeString(note.time.modifiedAt, now)}`
-          : `Created: ${getTimeString(note.time.createdAt, now)}`}
+          ? `Modified: ${getTimeString(note.time.modifiedAt, time.now)}`
+          : `Created: ${getTimeString(note.time.createdAt, time.now)}`}
       </small>
     </span>
     <DropdownMenu.Root>
