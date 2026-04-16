@@ -4,12 +4,23 @@
   import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
   import { Ellipsis, Pencil, Trash } from "@lucide/svelte";
   import { getEditorMethodsContext } from "$lib/contexts/editorMethodsContext";
+  import { onMount } from "svelte";
 
   const { editNote, deleteNote } = getEditorMethodsContext();
 
   let { note }: { note: Note } = $props();
 
-  function getTimeString(date: Date | string): string {
+  let now = $state(Date.now());
+
+  onMount(() => {
+    const interval = setInterval(() => {
+      now = Date.now();
+    }, 60000);
+
+    return () => clearInterval(interval);
+  });
+
+  function getTimeString(date: Date | string, now: number): string {
     date = new Date(date);
 
     const rtf = new Intl.RelativeTimeFormat(undefined, {
@@ -28,7 +39,7 @@
     ];
     const LEN_DIVISIONS = DIVISIONS.length;
 
-    let duration = (date.getTime() - new Date().getTime()) / 1000;
+    let duration = (date.getTime() - now) / 1000;
     let timeString = "";
 
     for (let i = 0; i < LEN_DIVISIONS; i++) {
@@ -52,8 +63,8 @@
     <span>
       <small class="text-gray-500">
         {note.time.modifiedAt
-          ? `Modified: ${getTimeString(note.time.modifiedAt)}`
-          : `Created: ${getTimeString(note.time.createdAt)}`}
+          ? `Modified: ${getTimeString(note.time.modifiedAt, now)}`
+          : `Created: ${getTimeString(note.time.createdAt, now)}`}
       </small>
     </span>
     <DropdownMenu.Root>
