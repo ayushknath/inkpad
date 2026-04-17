@@ -31,14 +31,19 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
-      - name: Setup Node
+      - name: Setup Node (without pnpm cache)
+        uses: actions/setup-node@v6
+        with:
+          node-version: lts/*
+
+      - name: Enable pnpm (corepack)
+        run: corepack enable
+
+      - name: Setup Node (with pnpm cache)
         uses: actions/setup-node@v6
         with:
           node-version: lts/*
           cache: "pnpm"
-
-      - name: Enable pnpm (corepack)
-        run: corepack enable
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
