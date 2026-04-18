@@ -1,6 +1,7 @@
 import { storageService } from "$lib/service/storageService";
 import type { editorStatesType } from "$lib/types/editorStatesType";
 import type { Note, saveStatusType } from "$lib/types/types";
+import { tiptapTextSearch } from "$lib/utils/tiptapTextSearch";
 
 interface AppState {
   notes: Note[];
@@ -32,18 +33,7 @@ function createAppStore() {
 
     return state.notes.filter((note) => {
       let titleMatch = note.title.toLowerCase().includes(q);
-      let bodyMatch: boolean = false;
-
-      for (let p of note.body.content) {
-        if (!p.content) continue;
-
-        for (let n of p.content) {
-          bodyMatch = n.text.toLowerCase().includes(q);
-          if (bodyMatch) break;
-        }
-
-        if (bodyMatch) break;
-      }
+      let bodyMatch = tiptapTextSearch(note.body, q);
 
       return titleMatch || bodyMatch;
     });
