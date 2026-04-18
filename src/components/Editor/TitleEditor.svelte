@@ -1,10 +1,6 @@
 <script lang="ts">
-  import { getEditorContext } from "$lib/contexts/editorContext";
-  import { getDebounceSaveContext } from "$lib/contexts/debounceSaveContext";
-
-  const editorStates = getEditorContext();
-  const { clearDebounceSaveTimer, startDebounceSaveTimer } =
-    getDebounceSaveContext();
+  import { appStore } from "$lib/state/appStore.svelte";
+  import { saveService } from "$lib/service/saveService";
 </script>
 
 <div class="title-field mb-12">
@@ -12,10 +8,9 @@
     class="text-xl w-full"
     id="editor-title-input"
     type="text"
-    bind:value={editorStates.editorTitle}
+    bind:value={appStore.state.editor.editorTitle}
     oninput={() => {
-      clearDebounceSaveTimer();
-      startDebounceSaveTimer();
+      saveService.resetTimer();
     }}
     placeholder="Title goes here..."
   />

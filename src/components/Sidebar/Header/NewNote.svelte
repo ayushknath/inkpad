@@ -1,11 +1,8 @@
 <script lang="ts">
   import { Button } from "$lib/components/ui/button/index.js";
   import { Plus } from "@lucide/svelte";
-  import { getEditorContext } from "$lib/contexts/editorContext";
-  import { getEditorMethodsContext } from "$lib/contexts/editorMethodsContext";
-
-  const editorStates = getEditorContext();
-  const { saveNote, clearEditor } = getEditorMethodsContext();
+  import { appStore } from "$lib/state/appStore.svelte";
+  import { noteService } from "$lib/service/noteService";
 </script>
 
 <Button
@@ -14,9 +11,9 @@
   variant="outline"
   title="New note"
   onclick={() => {
-    if (editorStates.activeNote) saveNote();
-    editorStates.activeNote = null;
-    clearEditor();
+    if (appStore.state.editor.activeNote) noteService.saveNote();
+    appStore.state.editor.activeNote = null;
+    noteService.clearEditor();
   }}
 >
   <Plus />

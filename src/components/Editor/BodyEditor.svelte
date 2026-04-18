@@ -1,7 +1,5 @@
 <script lang="ts">
-  import { getEditorContext } from "$lib/contexts/editorContext";
-
-  const editorStates = getEditorContext();
+  import { appStore } from "$lib/state/appStore.svelte";
 </script>
 
-<div class="body-field" bind:this={editorStates.bodyField}></div>
+<div class="body-field" bind:this={appStore.state.editor.bodyField}></div>

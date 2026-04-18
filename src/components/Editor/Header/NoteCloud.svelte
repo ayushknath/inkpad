@@ -1,20 +1,20 @@
 <script lang="ts">
   import { CloudUpload, CloudCheck, CloudAlert, Cloud } from "@lucide/svelte";
-  import { getEditorContext } from "$lib/contexts/editorContext";
-  import { getSaveStatusContext } from "$lib/contexts/saveStatusContext";
-
-  const editorStates = getEditorContext();
-  const saveStatus = getSaveStatusContext();
+  import { appStore } from "$lib/state/appStore.svelte";
 </script>
 
 <div class="note-save-status">
-  {#if editorStates.activeNote}
-    <div title={saveStatus.status ? saveStatus.status : ""}>
-      {#if saveStatus.status === "saving"}
+  {#if appStore.state.editor.activeNote}
+    <div
+      title={appStore.state.noteSave.status
+        ? appStore.state.noteSave.status
+        : ""}
+    >
+      {#if appStore.state.noteSave.status === "saving"}
         <CloudUpload size={20} />
-      {:else if saveStatus.status === "saved"}
+      {:else if appStore.state.noteSave.status === "saved"}
         <CloudCheck size={20} />
-      {:else if saveStatus.status === "error"}
+      {:else if appStore.state.noteSave.status === "error"}
         <CloudAlert size={20} />
       {:else}
         <Cloud size={20} />

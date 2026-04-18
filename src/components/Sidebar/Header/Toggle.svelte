@@ -1,9 +1,7 @@
 <script lang="ts">
   import { Button } from "$lib/components/ui/button/index.js";
+  import { appStore } from "$lib/state/appStore.svelte";
   import { PanelRight } from "@lucide/svelte";
-  import { getSidebarContext } from "$lib/contexts/sidebarContext";
-
-  const sidebarState = getSidebarContext();
 </script>
 
 <Button
@@ -11,7 +9,9 @@
   variant="outline"
   class="toggle"
   title="Toggle sidebar"
-  onclick={() => (sidebarState.isSidebarClosed = !sidebarState.isSidebarClosed)}
+  onclick={() =>
+    (appStore.state.sidebar.isSidebarClosed =
+      !appStore.state.sidebar.isSidebarClosed)}
 >
   <PanelRight />
 </Button>

@@ -3,10 +3,8 @@
   import { Button } from "$lib/components/ui/button/index.js";
   import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
   import { Ellipsis, Pencil, Trash } from "@lucide/svelte";
-  import { getEditorMethodsContext } from "$lib/contexts/editorMethodsContext";
   import { time } from "$lib/state/time.svelte";
-
-  const { editNote, deleteNote } = getEditorMethodsContext();
+  import { noteService } from "$lib/service/noteService";
 
   let { note }: { note: Note } = $props();
 
@@ -68,10 +66,10 @@
       </DropdownMenu.Trigger>
       <DropdownMenu.Content class="w-auto">
         <DropdownMenu.Group>
-          <DropdownMenu.Item onSelect={() => editNote(note.id)}>
+          <DropdownMenu.Item onSelect={() => noteService.editNote(note.id)}>
             <Pencil /> Edit
           </DropdownMenu.Item>
-          <DropdownMenu.Item onSelect={() => deleteNote(note.id)}>
+          <DropdownMenu.Item onSelect={() => noteService.deleteNote(note.id)}>
             <Trash /> Delete
           </DropdownMenu.Item>
         </DropdownMenu.Group>

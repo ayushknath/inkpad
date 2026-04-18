@@ -1,15 +1,13 @@
 <script lang="ts">
-  import { getEditorContext } from "$lib/contexts/editorContext";
+  import { appStore } from "$lib/state/appStore.svelte";
   import type { ToolType } from "$lib/types/components/toolType";
   import Tool from "./Tool.svelte";
-
-  const editorStates = getEditorContext();
 
   const tools: ToolType[] = [
     {
       name: "bold",
       canExecute() {
-        return editorStates.editorState.editor
+        return appStore.state.editor.editorState.editor
           ?.can()
           .chain()
           .focus()
@@ -17,20 +15,20 @@
           .run();
       },
       execute() {
-        return editorStates.editorState.editor
+        return appStore.state.editor.editorState.editor
           ?.chain()
           .focus()
           .toggleBold()
           .run();
       },
       isActive() {
-        return editorStates.editorState.editor?.isActive("bold");
+        return appStore.state.editor.editorState.editor?.isActive("bold");
       },
     },
     {
       name: "italic",
       canExecute() {
-        return editorStates.editorState.editor
+        return appStore.state.editor.editorState.editor
           ?.can()
           .chain()
           .focus()
@@ -38,20 +36,20 @@
           .run();
       },
       execute() {
-        return editorStates.editorState.editor
+        return appStore.state.editor.editorState.editor
           ?.chain()
           .focus()
           .toggleItalic()
           .run();
       },
       isActive() {
-        return editorStates.editorState.editor?.isActive("italic");
+        return appStore.state.editor.editorState.editor?.isActive("italic");
       },
     },
     {
       name: "underline",
       canExecute() {
-        return editorStates.editorState.editor
+        return appStore.state.editor.editorState.editor
           ?.can()
           .chain()
           .focus()
@@ -59,20 +57,20 @@
           .run();
       },
       execute() {
-        return editorStates.editorState.editor
+        return appStore.state.editor.editorState.editor
           ?.chain()
           .focus()
           .toggleUnderline()
           .run();
       },
       isActive() {
-        return editorStates.editorState.editor?.isActive("underline");
+        return appStore.state.editor.editorState.editor?.isActive("underline");
       },
     },
     {
       name: "strike",
       canExecute() {
-        return editorStates.editorState.editor
+        return appStore.state.editor.editorState.editor
           ?.can()
           .chain()
           .focus()
@@ -80,20 +78,20 @@
           .run();
       },
       execute() {
-        return editorStates.editorState.editor
+        return appStore.state.editor.editorState.editor
           ?.chain()
           .focus()
           .toggleStrike()
           .run();
       },
       isActive() {
-        return editorStates.editorState.editor?.isActive("strike");
+        return appStore.state.editor.editorState.editor?.isActive("strike");
       },
     },
     {
       name: "bulletList",
       canExecute() {
-        return editorStates.editorState.editor
+        return appStore.state.editor.editorState.editor
           ?.can()
           .chain()
           .focus()
@@ -101,20 +99,20 @@
           .run();
       },
       execute() {
-        return editorStates.editorState.editor
+        return appStore.state.editor.editorState.editor
           ?.chain()
           .focus()
           .toggleBulletList()
           .run();
       },
       isActive() {
-        return editorStates.editorState.editor?.isActive("bulletList");
+        return appStore.state.editor.editorState.editor?.isActive("bulletList");
       },
     },
     {
       name: "orderedList",
       canExecute() {
-        return editorStates.editorState.editor
+        return appStore.state.editor.editorState.editor
           ?.can()
           .chain()
           .focus()
@@ -122,20 +120,22 @@
           .run();
       },
       execute() {
-        return editorStates.editorState.editor
+        return appStore.state.editor.editorState.editor
           ?.chain()
           .focus()
           .toggleOrderedList()
           .run();
       },
       isActive() {
-        return editorStates.editorState.editor?.isActive("orderedList");
+        return appStore.state.editor.editorState.editor?.isActive(
+          "orderedList",
+        );
       },
     },
     {
       name: "heading1",
       canExecute() {
-        return editorStates.editorState.editor
+        return appStore.state.editor.editorState.editor
           ?.can()
           .chain()
           .focus()
@@ -143,14 +143,14 @@
           .run();
       },
       execute() {
-        return editorStates.editorState.editor
+        return appStore.state.editor.editorState.editor
           ?.chain()
           .focus()
           .toggleHeading({ level: 1 })
           .run();
       },
       isActive() {
-        return editorStates.editorState.editor?.isActive("heading", {
+        return appStore.state.editor.editorState.editor?.isActive("heading", {
           level: 1,
         });
       },
@@ -158,7 +158,7 @@
     {
       name: "heading2",
       canExecute() {
-        return editorStates.editorState.editor
+        return appStore.state.editor.editorState.editor
           ?.can()
           .chain()
           .focus()
@@ -166,14 +166,14 @@
           .run();
       },
       execute() {
-        return editorStates.editorState.editor
+        return appStore.state.editor.editorState.editor
           ?.chain()
           .focus()
           .toggleHeading({ level: 2 })
           .run();
       },
       isActive() {
-        return editorStates.editorState.editor?.isActive("heading", {
+        return appStore.state.editor.editorState.editor?.isActive("heading", {
           level: 2,
         });
       },
@@ -181,7 +181,7 @@
     {
       name: "codeBlock",
       canExecute() {
-        return editorStates.editorState.editor
+        return appStore.state.editor.editorState.editor
           ?.can()
           .chain()
           .focus()
@@ -189,14 +189,14 @@
           .run();
       },
       execute() {
-        return editorStates.editorState.editor
+        return appStore.state.editor.editorState.editor
           ?.chain()
           .focus()
           .toggleCodeBlock()
           .run();
       },
       isActive() {
-        return editorStates.editorState.editor?.isActive("codeBlock");
+        return appStore.state.editor.editorState.editor?.isActive("codeBlock");
       },
     },
   ];
