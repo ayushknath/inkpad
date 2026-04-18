@@ -5,6 +5,7 @@
   import { Ellipsis, Pencil, Trash } from "@lucide/svelte";
   import { time } from "$lib/state/time.svelte";
   import { noteService } from "$lib/service/noteService";
+  import { tiptapTextExtract } from "$lib/utils/tiptapTextExtract";
 
   let { note }: { note: Note } = $props();
 
@@ -83,9 +84,7 @@
     {note.title}
   </h2>
   <p class="note-body text-sm">
-    {#each note.body.content[0].content as c}
-      <span>{c.text}</span>
-    {/each}
+    {tiptapTextExtract(note.body, undefined, 5)}
   </p>
 </li>
 
