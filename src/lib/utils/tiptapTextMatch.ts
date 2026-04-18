@@ -5,7 +5,7 @@ function tiptapTextMatch(node: any, query: string): boolean {
     return node.text.toLowerCase().includes(query);
   }
 
-  if (node.content) {
+  if (node.content && Array.isArray(node.content)) {
     return node.content.some((child: any) => tiptapTextMatch(child, query));
   }
 
