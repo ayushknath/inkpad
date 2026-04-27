@@ -20,6 +20,7 @@
 <Button
   size="icon"
   variant="outline"
+  title={tool.title}
   class={tool.isActive()
     ? "bg-gray-800 text-white outline-transparent hover:bg-gray-600 hover:text-white hover:outline-transparent"
     : ""}

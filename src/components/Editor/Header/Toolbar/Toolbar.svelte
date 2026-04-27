@@ -6,6 +6,7 @@
   const tools: ToolType[] = [
     {
       name: "bold",
+      title: "Bold",
       canExecute() {
         return appStore.state.editor.editorState.editor
           ?.can()
@@ -27,6 +28,7 @@
     },
     {
       name: "italic",
+      title: "Italic",
       canExecute() {
         return appStore.state.editor.editorState.editor
           ?.can()
@@ -48,6 +50,7 @@
     },
     {
       name: "underline",
+      title: "Underline",
       canExecute() {
         return appStore.state.editor.editorState.editor
           ?.can()
@@ -69,6 +72,7 @@
     },
     {
       name: "strike",
+      title: "Strike",
       canExecute() {
         return appStore.state.editor.editorState.editor
           ?.can()
@@ -90,6 +94,7 @@
     },
     {
       name: "bulletList",
+      title: "Bullet List",
       canExecute() {
         return appStore.state.editor.editorState.editor
           ?.can()
@@ -111,6 +116,7 @@
     },
     {
       name: "orderedList",
+      title: "Ordered List",
       canExecute() {
         return appStore.state.editor.editorState.editor
           ?.can()
@@ -134,6 +140,7 @@
     },
     {
       name: "taskList",
+      title: "Task List",
       canExecute() {
         return appStore.state.editor.editorState.editor
           ?.can()
@@ -155,6 +162,7 @@
     },
     {
       name: "heading1",
+      title: "Heading 1",
       canExecute() {
         return appStore.state.editor.editorState.editor
           ?.can()
@@ -178,6 +186,7 @@
     },
     {
       name: "heading2",
+      title: "Heading 2",
       canExecute() {
         return appStore.state.editor.editorState.editor
           ?.can()
@@ -201,6 +210,7 @@
     },
     {
       name: "codeBlock",
+      title: "Code Block",
       canExecute() {
         return appStore.state.editor.editorState.editor
           ?.can()
