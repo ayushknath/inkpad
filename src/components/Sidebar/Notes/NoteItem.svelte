@@ -50,42 +50,49 @@
   }
 </script>
 
-<li class="border rounded-md p-2">
-  <header class="flex items-center justify-between mb-2">
-    <span>
-      <small class="text-gray-500">
-        {note.time.modifiedAt
-          ? `Modified: ${getTimeString(note.time.modifiedAt, time.now)}`
-          : `Created: ${getTimeString(note.time.createdAt, time.now)}`}
-      </small>
-    </span>
+<li class="relative">
+  <div class="absolute top-2 right-2">
     <DropdownMenu.Root>
       <DropdownMenu.Trigger>
         <Button size="icon-sm" variant="outline" title="More options">
           <Ellipsis />
         </Button>
       </DropdownMenu.Trigger>
-      <DropdownMenu.Content class="w-auto">
+      <DropdownMenu.Content>
         <DropdownMenu.Group>
-          <DropdownMenu.Item onSelect={() => noteService.editNote(note.id)}>
-            <Pencil /> Edit
-          </DropdownMenu.Item>
           <DropdownMenu.Item onSelect={() => noteService.deleteNote(note.id)}>
             <Trash /> Delete
           </DropdownMenu.Item>
         </DropdownMenu.Group>
       </DropdownMenu.Content>
     </DropdownMenu.Root>
-  </header>
+  </div>
 
-  <h2
-    class="note-title whitespace-nowrap overflow-hidden text-ellipsis font-bold mb-1"
+  <button
+    class="w-full p-2 border rounded-md transition-[background-color] hover:bg-gray-50"
+    onclick={() => noteService.editNote(note.id)}
   >
-    {note.title}
-  </h2>
-  <p class="note-body text-sm">
-    {tiptapTextExtract(note.body, undefined, 5)}
-  </p>
+    <header class="flex items-center justify-between mb-2">
+      <span>
+        <small class="text-gray-500">
+          {note.time.modifiedAt
+            ? `Modified: ${getTimeString(note.time.modifiedAt, time.now)}`
+            : `Created: ${getTimeString(note.time.createdAt, time.now)}`}
+        </small>
+      </span>
+    </header>
+
+    <div class="note-info text-left">
+      <h2
+        class="note-title whitespace-nowrap overflow-hidden text-ellipsis font-bold mb-1"
+      >
+        {note.title}
+      </h2>
+      <p class="note-body text-sm">
+        {tiptapTextExtract(note.body, undefined, 5)}
+      </p>
+    </div>
+  </button>
 </li>
 
 <style>
