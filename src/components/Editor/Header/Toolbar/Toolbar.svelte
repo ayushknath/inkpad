@@ -133,6 +133,27 @@
       },
     },
     {
+      name: "taskList",
+      canExecute() {
+        return appStore.state.editor.editorState.editor
+          ?.can()
+          .chain()
+          .focus()
+          .toggleTaskList()
+          .run();
+      },
+      execute() {
+        return appStore.state.editor.editorState.editor
+          ?.chain()
+          .focus()
+          .toggleTaskList()
+          .run();
+      },
+      isActive() {
+        return appStore.state.editor.editorState.editor?.isActive("taskList");
+      },
+    },
+    {
       name: "heading1",
       canExecute() {
         return appStore.state.editor.editorState.editor

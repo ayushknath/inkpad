@@ -3,6 +3,7 @@
   import { Editor } from "@tiptap/core";
   import { StarterKit } from "@tiptap/starter-kit";
   import { Placeholder } from "@tiptap/extensions";
+  import { TaskList, TaskItem } from "@tiptap/extension-list";
   import Sidebar from "./components/Sidebar/Sidebar.svelte";
   import NoteEditor from "./components/Editor/NoteEditor.svelte";
   import { startTime, stopTime } from "$lib/state/time.svelte";
@@ -16,6 +17,10 @@
       element: appStore.state.editor.bodyField,
       extensions: [
         StarterKit,
+        TaskList,
+        TaskItem.configure({
+          nested: true,
+        }),
         Placeholder.configure({
           placeholder: "Body goes here...",
         }),

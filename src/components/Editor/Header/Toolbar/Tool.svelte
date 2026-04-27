@@ -8,6 +8,7 @@
     Italic,
     List,
     ListOrdered,
+    SquareCheck,
     Strikethrough,
     Underline,
   } from "@lucide/svelte";
@@ -37,6 +38,8 @@
     <List />
   {:else if tool.name === "orderedList"}
     <ListOrdered />
+  {:else if tool.name === "taskList"}
+    <SquareCheck />
   {:else if tool.name === "heading1"}
     <Heading1 />
   {:else if tool.name === "heading2"}
