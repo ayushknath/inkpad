@@ -17,7 +17,11 @@
       element: appStore.state.editor.bodyField,
       extensions: [
         StarterKit,
-        TaskList,
+        TaskList.configure({
+          HTMLAttributes: {
+            class: "tiptap-task-list",
+          },
+        }),
         TaskItem.configure({
           nested: true,
         }),
@@ -73,6 +77,23 @@
   :global(.tiptap ul) {
     list-style-type: disc;
     padding-left: 1.5rem;
+  }
+
+  :global(.tiptap ul.tiptap-task-list) {
+    list-style-type: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  :global(.tiptap ul.tiptap-task-list > li) {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  :global(.tiptap ul.tiptap-task-list > li[data-checked="true"]) {
+    text-decoration: line-through;
   }
 
   :global(.tiptap ol) {
