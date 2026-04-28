@@ -5,7 +5,7 @@
 
 <div class="title-field mb-12">
   <input
-    class="text-xl w-full"
+    class="w-full text-2xl font-bold"
     id="editor-title-input"
     type="text"
     bind:value={appStore.state.editor.editorTitle}

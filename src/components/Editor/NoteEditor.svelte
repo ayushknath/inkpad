@@ -4,7 +4,7 @@
   import BodyEditor from "./BodyEditor.svelte";
 </script>
 
-<section class="editor py-4 px-8">
+<section class="editor py-4 px-12">
   <Header />
 
   <div class="editor-fields">

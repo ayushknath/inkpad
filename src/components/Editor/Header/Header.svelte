@@ -3,7 +3,7 @@
   import NoteCloud from "./NoteCloud.svelte";
 </script>
 
-<header class="flex items-center justify-between mb-12">
+<header class="flex items-center justify-between mb-16">
   <Toolbar />
 
   <NoteCloud />
